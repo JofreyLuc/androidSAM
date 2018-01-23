@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <GridLayout
+        android:id="@+id/gridSiteList"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="3dp"
+        android:layout_centerVertical="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_row="0"
+            android:textStyle="bold"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:maxLength="30"
+            android:layout_margin="3dp"
+            android:id="@+id/sitelist_item_name"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:layout_column="0"
+            android:layout_row="1"
+            android:maxLength="40"
+            android:layout_margin="3dp"
+            android:id="@+id/sitelist_item_adress"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:textStyle="italic"
+            android:layout_gravity="left"
+            android:layout_margin="3dp"
+            android:layout_marginLeft="5dp"
+            android:id="@+id/sitelist_item_category"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_row="1"
+            android:text="Pas de résumé"
+            android:layout_margin="3dp"
+            android:layout_marginLeft="5dp"
+            android:layout_gravity="right"
+            android:scrollHorizontally="true"
+            android:maxLength="50"
+            android:ellipsize="end"
+            android:id="@+id/sitelist_item_summary"
+            />
+
+
+
+
+    </GridLayout>
+
+    <Button
+        android:id="@+id/sitelist_item_delButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:text="@string/button_deleteSite" />
+
+</RelativeLayout>

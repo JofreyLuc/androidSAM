@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">SAM</string>
+    <string name="title_activity_sam">Sortir à Metz</string>
+
+    <string name="button_gotoMap">Carte</string>
+    <string name="button_gotoSites">Sites</string>
+
+    <string name="button_gotoListView">Liste des sites</string>
+    <string name="button_gotoAddSite">Ajouter un site...</string>
+
+    <string name="button_deleteSite">Supprimer</string>
+
+    <string name="label_addSite">Nouveau site</string>
+    <string name="label_newSitePosition">Emplacement :</string>
+    <string name="label_newSitePosition_myPosition">Ma position actuelle</string>
+    <string name="label_newSitePosition_coordinates">Entrer les coordonnées</string>
+    <string name="label_newSiteCategory">Categorie :</string>
+    <string name="label_newSiteName">Nom du site (*) :</string>
+    <string name="label_fixedPosition">Position de l\'utilisateur</string>
+    <string name="label_newSiteAdress">Adresse (*) :</string>
+    <string name="label_newSiteSummary">Résumé :</string>
+    <string name="button_addNewSite">Ajouter</string>
+    <string name="label_newSiteRequired">(*) = champs requis</string>
+
+</resources>

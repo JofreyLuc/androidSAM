@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="categories_array">
+        <item>Boutique</item>
+        <item>Café</item>
+        <item>Monument</item>
+        <item>Restaurant</item>
+        <item>Autre</item>
+    </string-array>
+</resources>
