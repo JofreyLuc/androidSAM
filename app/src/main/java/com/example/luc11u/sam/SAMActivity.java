@@ -1,16 +1,18 @@
 package com.example.luc11u.sam;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +22,6 @@ import com.example.luc11u.sam.model.Site;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -32,15 +33,21 @@ public class SAMActivity extends FragmentActivity implements OnMapReadyCallback,
     final Map map = new Map();
     private GoogleMap mMap;
     private Location currentLocation;
+    private ArrayList<Site> sites;
     private ArrayList<Site> sitesToMark;
     private ArrayList<Marker> markers;
     private SAMDBHelper dbHelper;
+    private LocationManager locM;
+    private LocationListener locLis;
+
+    private float CURRENT_MAX_DISTANCE = 200;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sam);
 
+        sites = new ArrayList<>();
         sitesToMark = new ArrayList<>();
         markers = new ArrayList<>();
 
@@ -68,10 +75,10 @@ public class SAMActivity extends FragmentActivity implements OnMapReadyCallback,
             @Override
             public void onClick(View view) {
                 updateSitesList();
-                updateMarkerList();
+                updateSitesToMarkList();
+                markMap();
                 FragmentManager m = getSupportFragmentManager();
                 FragmentTransaction ft = m.beginTransaction();
-
 
                 ft.replace(R.id.contentView, map);
                 ft.addToBackStack(null);
@@ -87,30 +94,13 @@ public class SAMActivity extends FragmentActivity implements OnMapReadyCallback,
         ft.add(R.id.contentView, map);
         ft.commit();
 
-
-
-
-        LocationListener locLis = new LocationListener() {
+        locLis = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 if (mMap != null) {
-                    try {
-                        if (mMap.isMyLocationEnabled()) {
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
-                            currentLocation = location;
-                            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-                            markMap();
-                        } else {
-                            mMap.setMyLocationEnabled(true);
-                            currentLocation = location;
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
-                            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-                            markMap();
-                        }
-                    } catch (SecurityException e){
-                        Toast toast = Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
+                    zoomTo(location);
+                    currentLocation = location;
+                    markMap();
                 }
             }
 
@@ -130,20 +120,41 @@ public class SAMActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         };
 
-        LocationManager locM = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locM = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        try {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        } else {
             locM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 1, locLis);
-        } catch (SecurityException e){
-            Toast toast = Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT);
-            toast.show();
         }
+    }
 
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
+                    try {
+
+                        locM.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1, 1, locLis);
+                    } catch (SecurityException e) {
+                        Toast.makeText(this, "Erreur permission GPS", Toast.LENGTH_LONG);
+
+                    }
+
+                } else {
+
+                    Toast.makeText(this, "GPS nécessaire", Toast.LENGTH_LONG);
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                }
+                return;
+            }
+        }
     }
 
     private void updateSitesList(){
-        sitesToMark.clear();
+        sites.clear();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(SAMDBEntries.FeedEntry.TABLE_NAME, null, null, null, null, null, null);
 
@@ -157,41 +168,55 @@ public class SAMActivity extends FragmentActivity implements OnMapReadyCallback,
                     cursor.getDouble(cursor.getColumnIndexOrThrow(SAMDBEntries.FeedEntry.COLUMN_NAME_LATITUDE)),
                     cursor.getDouble(cursor.getColumnIndexOrThrow(SAMDBEntries.FeedEntry.COLUMN_NAME_LONGITUDE))
             );
-            sitesToMark.add(s);
+            sites.add(s);
         }
         db.close();
+    }
+
+    private void updateSitesToMarkList() {
+        sitesToMark.clear();
+        for (Site s : sites) {
+            //if (s.getCategory() == CURRENT_CATEGORY) {
+            //CHECK DISTANCE
+//            float[] distance = new float[1];
+//            Location.distanceBetween(m.getPosition().latitude, m.getPosition().longitude,
+//                    currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
+//            if (distance[0] <= CURRENT_MAX_DISTANCE) {
+//                m.setVisible(true);
+//            } else {
+//                m.setVisible(false);
+//            }
+            sitesToMark.add(s);
+            //}
+        }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        } else {
+            mMap.setMyLocationEnabled(true);
+            zoomTo(locM.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+            currentLocation = locM.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
         updateSitesList();
-        updateMarkerList();
+        updateSitesToMarkList();
+        markMap();
     }
 
-    private void updateMarkerList(){
-        markers.clear();
-        for (Site s : sitesToMark) {
-            Marker newM = mMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(s.getLatitude(), s.getLongitude()))
-                                .title(s.getNom()));
-            markers.add(newM);
-            newM.setVisible(false);
-        }
+    private void zoomTo(Location l) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(l.getLatitude(), l.getLongitude())));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
     }
 
     private void markMap() {
-        Log.d("AZER", "markmap");
-        for (Marker m : markers) {
-            Log.d("AZER", m.getTitle());
-            float[] distance = new float[1];
-            Location.distanceBetween(m.getPosition().latitude, m.getPosition().longitude,
-                    currentLocation.getLatitude(), currentLocation.getLongitude(), distance);
-            if (distance[0] <= 200) {
-                m.setVisible(true);
-            } else {
-                m.setVisible(false);
-            }
+        mMap.clear();
+        for (Site s : sitesToMark) {
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(s.getLatitude(), s.getLongitude()))
+                    .title(s.getNom()));
         }
     }
 
