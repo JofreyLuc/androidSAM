@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.luc11u.sam.DBSitesList">
+    tools:context="com.example.luc11u.sam.fragment.DBSitesListFragment">
 
     <ListView
         android:layout_width="wrap_content"

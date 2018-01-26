@@ -1,11 +1,8 @@
-package com.example.luc11u.sam;
+package com.example.luc11u.sam.database;
 
 import android.provider.BaseColumns;
 
-/**
- * Created by luc11u on 22-Jan-18.
- */
-
+// Static class defining the db columns names
 public final class SAMDBEntries {
 
     public static class FeedEntry implements BaseColumns {

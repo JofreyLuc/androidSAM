@@ -1,9 +1,10 @@
-package com.example.luc11u.sam;
+package com.example.luc11u.sam.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+// Database helper used to access the db
 public class SAMDBHelper extends SQLiteOpenHelper {
 
     // Database version, changes on upgrade

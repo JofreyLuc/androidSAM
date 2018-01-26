@@ -1,4 +1,4 @@
-package com.example.luc11u.sam;
+package com.example.luc11u.sam.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,19 +12,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.example.luc11u.sam.R;
+import com.example.luc11u.sam.listener.AddTextFieldsWatcher;
+import com.example.luc11u.sam.parentInterface.OnFieldsToCheck;
+import com.example.luc11u.sam.parentInterface.OnSiteToAdd;
 
-public class DBAddSite extends Fragment {
+// Fragment displaying the "add a new site" section of the app
+public class DBAddSiteFragment extends Fragment implements OnFieldsToCheck {
 
-    Button addButton;
-    EditText editName, editAdress, editSummary;
-    Spinner categoryChooser;
-    OnSiteToAdd clickDataReceiver;
+    private Button addButton;
+    private EditText editName, editAdress, editSummary;
+    private Spinner categoryChooser;
+    // Object which will register the addition of a new site
+    private OnSiteToAdd clickDataReceiver;
 
-    public DBAddSite() {
+    public DBAddSiteFragment() {
         // Required empty public constructor
     }
 
-
+    // Checks if the parent can register the addition of a new site
     private void onAttachToParentFragment(Fragment fragment) {
         try {
             clickDataReceiver = (OnSiteToAdd)fragment;
@@ -43,56 +49,21 @@ public class DBAddSite extends Fragment {
 
         onAttachToParentFragment(getParentFragment());
 
-
+        // Puts items in the category sinner
         categoryChooser = (Spinner) view.findViewById(R.id.choiceCategory);
-
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(), R.array.categories_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         categoryChooser.setAdapter(adapter);
 
-
-
-
+        // Attach listeners to the editTexts for name and adress fields
         editName = (EditText) view.findViewById(R.id.edit_newSiteName);
-        editName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkRequiredFields();
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
+        editName.addTextChangedListener(new AddTextFieldsWatcher(this));
         editAdress = (EditText) view.findViewById(R.id.edit_newSiteAdress);
-        editAdress.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkRequiredFields();
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
+        editAdress.addTextChangedListener(new AddTextFieldsWatcher(this));
 
         editSummary = (EditText) view.findViewById(R.id.edit_newSiteSummary);
 
-
+        // Attachs a listener to the "Add" button
         addButton = (Button) view.findViewById(R.id.button_addNewSite);
         addButton.setOnClickListener(new Button.OnClickListener() {
             @Override
@@ -107,11 +78,12 @@ public class DBAddSite extends Fragment {
 
         checkRequiredFields();
 
-
         return view;
     }
 
-    private void checkRequiredFields(){
+    // Checks if the address and name fields are not empty and enables the add button accordingly
+    @Override
+    public void checkRequiredFields(){
         if (editName.getText().toString().isEmpty() || editAdress.getText().toString().isEmpty()) {
             addButton.setEnabled(false);
         } else {

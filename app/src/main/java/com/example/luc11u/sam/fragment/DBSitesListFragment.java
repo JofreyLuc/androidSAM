@@ -1,31 +1,34 @@
-package com.example.luc11u.sam;
+package com.example.luc11u.sam.fragment;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.example.luc11u.sam.R;
+import com.example.luc11u.sam.adapter.SiteListAdapter;
 import com.example.luc11u.sam.model.Site;
+import com.example.luc11u.sam.parentInterface.OnSiteToDelete;
 
 import java.util.ArrayList;
 
+// Fragment displaying a list of all the sites in the db
+public class DBSitesListFragment extends Fragment {
 
-public class DBSitesList extends Fragment {
-
+    // Adapter of the listView component
     private SiteListAdapter sla;
+    // List of current sites to display
     private ArrayList<Site> sites;
+    // Object which will handle the deletion of a site
     private OnSiteToDelete siteDeleter;
 
-    public DBSitesList() {
+    public DBSitesListFragment() {
         // Required empty public constructor
     }
 
+    // Checks if the parent is ables to handle the site deletion
     private void onAttachToFragmentParent(Fragment parent) {
         try {
             siteDeleter = (OnSiteToDelete) parent;
@@ -43,18 +46,14 @@ public class DBSitesList extends Fragment {
 
         onAttachToFragmentParent(getParentFragment());
 
+        // Attaches the listView adapter to the site view
         sites = new ArrayList<>();
-
         sla = new SiteListAdapter(this.getContext(), sites, siteDeleter);
         ((ListView) view.findViewById(R.id.listViewSites)).setAdapter(sla);
 
         return view;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
 
     public void updateListView(ArrayList<Site> s) {
         sites.clear();

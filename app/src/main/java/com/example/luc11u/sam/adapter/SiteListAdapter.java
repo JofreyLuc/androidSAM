@@ -1,7 +1,6 @@
-package com.example.luc11u.sam;
+package com.example.luc11u.sam.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,16 +9,21 @@ import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.luc11u.sam.R;
 import com.example.luc11u.sam.model.Site;
+import com.example.luc11u.sam.parentInterface.OnSiteToDelete;
 
 import java.util.ArrayList;
 
-
+// Site list view adapter, creates a custom view of an item of the list
 public class SiteListAdapter extends BaseAdapter implements ListAdapter {
+
+    // List of sites to display
     private ArrayList<Site> siteList = new ArrayList<>();
+    // Parent context
     private Context context;
+    // Object which will handle the deletion of a site
     private OnSiteToDelete siteDeleter;
 
     public SiteListAdapter(Context c, ArrayList<Site> s, OnSiteToDelete sD) {
@@ -43,6 +47,7 @@ public class SiteListAdapter extends BaseAdapter implements ListAdapter {
         return siteList.get(i).getId();
     }
 
+    // Returns the view of an item of the list
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View view = convertView;
@@ -66,6 +71,7 @@ public class SiteListAdapter extends BaseAdapter implements ListAdapter {
         GridLayout grid = (GridLayout) view.findViewById(R.id.gridSiteList);
         grid.getWidth();
 
+        // Deletion button : will delete a site in the local list and calls the object which will delete the site in the db
         Button delButton = (Button) view.findViewById(R.id.sitelist_item_delButton);
         delButton.setOnClickListener(new Button.OnClickListener() {
             @Override
